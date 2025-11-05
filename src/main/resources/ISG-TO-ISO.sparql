@@ -1,0 +1,34 @@
+PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
+PREFIX euvoc: <http://publications.europa.eu/ontology/euvoc#>
+
+SELECT DISTINCT
+    ?isg_cou_value
+    ?iso_3166_1_alpha_2_value
+    ?country_label_en
+    ?country_uri
+WHERE {
+    # Query the EU countries dataset
+    GRAPH <http://publications.europa.eu/resource/authority/country> {
+        ?country_uri a skos:Concept .
+        ?country_uri euvoc:context <http://publications.europa.eu/resource/authority/use-context/EU_EFTA_UK> .
+
+        # Get English label
+        ?country_uri skos:prefLabel ?country_label_en .
+        FILTER (lang(?country_label_en) = "en")
+
+        # Get ISG COU value and filter for specific value
+        ?country_uri skos:notation ?isg_cou .
+        FILTER(datatype(?isg_cou) = euvoc:ISG_COU)
+        BIND(str(?isg_cou) AS ?isg_cou_value)
+        FILTER(?isg_cou_value = "REPLACE_ME")  # Replace with actual ISG COU value
+
+        # Get ISO 3166-1 alpha-2 value
+        ?country_uri skos:notation ?iso_3166_1_alpha_2 .
+        FILTER(datatype(?iso_3166_1_alpha_2) = euvoc:ISO_3166_1_ALPHA_2)
+        BIND(str(?iso_3166_1_alpha_2) AS ?iso_3166_1_alpha_2_value)
+
+        # Exclude the European Union (EUR) and OP_DATPRO entries
+        FILTER (?country_uri != <http://publications.europa.eu/resource/authority/country/EUR>)
+        FILTER (?country_uri != <http://publications.europa.eu/resource/authority/country/OP_DATPRO>)
+    }
+}

@@ -1,0 +1,51 @@
+PREFIX org: <http://www.w3.org/ns/org#>
+PREFIX skosxl: <http://www.w3.org/2008/05/skos-xl#>
+PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
+PREFIX euvoc: <http://publications.europa.eu/ontology/euvoc#>
+PREFIX dct: <http://purl.org/dc/terms/>
+SELECT ?country_uri ?country_label_en ?isg_cou ?iso_3166_1_alpha_2 ?iso_3166_1_alpha_3
+FROM <http://publications.europa.eu/resource/authority/country>
+WHERE {
+    VALUES ?isg_cou_value_param { "" }  # Will be set in code
+
+    ?country_uri a skos:Concept .
+    ?country_uri skos:prefLabel ?country_label_en .
+    FILTER (lang(?country_label_en) = "en")
+    # Include all countries that are part of the EEA
+    ?country_uri dct:type ?membership .
+    FILTER (?membership = <http://publications.europa.eu/resource/authority/membership-classification/EEA>)
+    # Also include the United Kingdom and Switzerland
+    FILTER (?country_uri IN (
+                                ?country_uri,
+                                <http://publications.europa.eu/resource/authority/country/GBR>,
+                                <http://publications.europa.eu/resource/authority/country/CHE>
+                            ))
+    # Exclude the European Union (EUR) entry
+    FILTER (?country_uri != <http://publications.europa.eu/resource/authority/country/EUR>)
+    OPTIONAL {
+        ?country_uri skos:notation ?isg_cou .
+        FILTER(datatype(?isg_cou) = euvoc:ISG_COU)
+    }
+    OPTIONAL {
+        ?country_uri skos:notation ?iso_3166_1_alpha_2 .
+        FILTER(datatype(?iso_3166_1_alpha_2) = euvoc:ISO_3166_1_ALPHA_2)
+    }
+    OPTIONAL {
+        ?country_uri skos:notation ?iso_3166_1_alpha_3 .
+        FILTER(datatype(?iso_3166_1_alpha_3) = euvoc:ISO_3166_1_ALPHA_3)
+    }
+}
+LIMIT 100
+
+
+
+
+
+
+
+
+
+
+
+
+

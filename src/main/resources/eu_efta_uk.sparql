@@ -1,0 +1,48 @@
+PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
+PREFIX euvoc: <http://publications.europa.eu/ontology/euvoc#>
+
+SELECT DISTINCT
+    ?country_uri
+    (STR(?country_label_en_raw) AS ?country_label_en)
+    (STR(?country_label_no_raw) AS ?country_label_no)
+    ?isg_cou_str
+    ?iso_3166_1_alpha_2_str
+    ?iso_3166_1_alpha_3_str
+FROM <http://publications.europa.eu/resource/authority/country>
+WHERE {
+    ?country_uri a skos:Concept .
+    ?country_uri euvoc:context <http://publications.europa.eu/resource/authority/use-context/EU_EFTA_UK> .
+
+    # English label
+    ?country_uri skos:prefLabel ?country_label_en_raw .
+    FILTER (lang(?country_label_en_raw) = "en")
+
+    # Norwegian label
+    OPTIONAL {
+        ?country_uri skos:prefLabel ?country_label_no_raw .
+        FILTER (lang(?country_label_no_raw) = "no")
+    }
+
+    # Exclude the European Union (EUR) and OP_DATPRO entries
+    FILTER (?country_uri != <http://publications.europa.eu/resource/authority/country/EUR>)
+    FILTER (?country_uri != <http://publications.europa.eu/resource/authority/country/OP_DATPRO>)
+
+    OPTIONAL {
+        ?country_uri skos:notation ?isg_cou .
+        FILTER(datatype(?isg_cou) = euvoc:ISG_COU)
+        BIND(str(?isg_cou) AS ?isg_cou_str)
+    }
+
+    OPTIONAL {
+        ?country_uri skos:notation ?iso_3166_1_alpha_2 .
+        FILTER(datatype(?iso_3166_1_alpha_2) = euvoc:ISO_3166_1_ALPHA_2)
+        BIND(str(?iso_3166_1_alpha_2) AS ?iso_3166_1_alpha_2_str)
+    }
+
+    OPTIONAL {
+        ?country_uri skos:notation ?iso_3166_1_alpha_3 .
+        FILTER(datatype(?iso_3166_1_alpha_3) = euvoc:ISO_3166_1_ALPHA_3)
+        BIND(str(?iso_3166_1_alpha_3) AS ?iso_3166_1_alpha_3_str)
+    }
+}
+LIMIT 100

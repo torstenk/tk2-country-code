@@ -1,0 +1,3 @@
+spring:
+  application:
+    name: tk2-country-code
