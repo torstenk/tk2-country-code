@@ -1,0 +1,40 @@
+PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
+PREFIX euvoc: <http://publications.europa.eu/ontology/euvoc#>
+
+SELECT DISTINCT ?isg ?iso_alpha2 ?iso_alpha3 ?label_en ?country_uri
+FROM <http://publications.europa.eu/resource/authority/country>
+WHERE {
+    ?country_uri a skos:Concept .
+    ?country_uri euvoc:context <http://publications.europa.eu/resource/authority/use-context/EU_EFTA_UK> .
+
+    # English label
+    ?country_uri skos:prefLabel ?label_en .
+    FILTER (lang(?label_en) = "en")
+
+    # EESSI ISG country code
+    ?country_uri skos:notation ?isg_n .
+    FILTER (datatype(?isg_n) = euvoc:ISG_COU)
+    BIND (str(?isg_n) AS ?isg)
+
+    # ISO 3166-1 alpha-2 (e.g. GB)
+    OPTIONAL {
+        ?country_uri skos:notation ?a2 .
+        FILTER (datatype(?a2) = euvoc:ISO_3166_1_ALPHA_2)
+        BIND (str(?a2) AS ?iso_alpha2)
+    }
+
+    # ISO 3166-1 alpha-3 (e.g. GBR)
+    OPTIONAL {
+        ?country_uri skos:notation ?a3 .
+        FILTER (datatype(?a3) = euvoc:ISO_3166_1_ALPHA_3)
+        BIND (str(?a3) AS ?iso_alpha3)
+    }
+
+    # Exclude the European Union (EUR) and OP_DATPRO pseudo-entries
+    FILTER (?country_uri != <http://publications.europa.eu/resource/authority/country/EUR>)
+    FILTER (?country_uri != <http://publications.europa.eu/resource/authority/country/OP_DATPRO>)
+
+    # Replaced by the lookup script; leave empty to return all mappings
+    ##FILTER_CLAUSE##
+}
+ORDER BY ?isg
