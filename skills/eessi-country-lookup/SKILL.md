@@ -34,8 +34,9 @@ Kjør skriptet `scripts/lookup.sh` (krever `curl`; tabellformat krever `jq`):
 # Etter EESSI ISG-kode
 scripts/lookup.sh --isg UK
 
-# Etter ISO-kode (alpha-2 eller alpha-3)
+# Etter ISO-kode — godtar både alpha-2 (GB) og alpha-3 (GBR)
 scripts/lookup.sh --iso GB
+scripts/lookup.sh --iso GBR
 
 # Hele mappingtabellen
 scripts/lookup.sh --all
@@ -43,6 +44,9 @@ scripts/lookup.sh --all
 # Rå SPARQL-JSON i stedet for tabell
 scripts/lookup.sh --isg EL --format json
 ```
+
+Kodeformat: **ISG-koder er alltid 2 bokstaver** (f.eks. `UK`, `EL`, `NO`), mens `--iso`
+godtar både alpha-2 og alpha-3. Skriptet avviser koder med feil lengde per modus.
 
 Eksempel på svar (`--isg UK`):
 
@@ -65,7 +69,9 @@ Pass alltid på UK/EL-avvikene: bruk ISG-koden mot EESSI, ISO-koden mot alt anne
 `query/lookup.rq` er en parameterisert SPARQL-spørring. Skriptet setter inn et
 `FILTER`-uttrykk (`##FILTER_CLAUSE##`) basert på oppslagstypen, filtrerer på
 `EU_EFTA_UK`-konteksten og ekskluderer pseudo-oppføringene `EUR` og `OP_DATPRO`.
-Landkoder valideres (`^[A-Z]{2,3}$`) før de settes inn, for å unngå SPARQL-injeksjon.
+For `--iso` matcher filteret både `ISO_3166_1_ALPHA_2` og `ISO_3166_1_ALPHA_3`.
+Landkoder valideres per modus (`--isg` = `^[A-Z]{2}$`, `--iso` = `^[A-Z]{2,3}$`) før de
+settes inn, for å unngå SPARQL-injeksjon.
 
 Dette er samme mapping som Java-tjenesten i dette repoet bruker
 (`src/main/resources/ISG-TO-ISO.sparql`).

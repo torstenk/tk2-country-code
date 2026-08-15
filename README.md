@@ -41,7 +41,7 @@ mapping via et lite `curl`-skript mot SPARQL-endepunktet.
 # Etter EESSI ISG-kode
 skills/eessi-country-lookup/scripts/lookup.sh --isg UK
 
-# Etter ISO-kode (alpha-2 eller alpha-3)
+# Etter ISO-kode (alpha-2 GB eller alpha-3 GBR)
 skills/eessi-country-lookup/scripts/lookup.sh --iso GB
 
 # Hele mappingtabellen

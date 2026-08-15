@@ -4,12 +4,13 @@
 # Maps EESSI ISG country codes <-> ISO 3166-1 alpha-2/alpha-3.
 #
 # Usage:
-#   lookup.sh --isg UK          # look up by EESSI ISG code (e.g. UK, EL, NO)
-#   lookup.sh --iso GB          # look up by ISO 3166-1 alpha-2 code
+#   lookup.sh --isg UK          # look up by EESSI ISG code (always 2 letters)
+#   lookup.sh --iso GB          # look up by ISO 3166-1 alpha-2 (GB) or alpha-3 (GBR)
 #   lookup.sh --all             # dump the full mapping table
 #   lookup.sh --isg UK --format json   # raw SPARQL JSON (default: table)
 #
 # Notes:
+#   - EESSI ISG codes are always 2 letters; ISO accepts alpha-2 or alpha-3.
 #   - EESSI uses UK (ISO GB) and EL (ISO GR), which differ from ISO 3166-1.
 #   - Public endpoint, no auth. Requires: curl. Pretty table needs: jq.
 
@@ -39,11 +40,20 @@ done
 [[ -n "$mode" ]] || die "specify one of --isg CODE, --iso CODE, or --all"
 [[ -f "$QUERY_TEMPLATE" ]] || die "query template not found: $QUERY_TEMPLATE"
 
-# Uppercase the code and guard against SPARQL string injection.
+# Uppercase the code and validate per mode (guards against SPARQL injection).
 if [[ "$mode" != "all" ]]; then
     [[ -n "$code" ]] || die "--$mode needs a country code"
     code="$(printf '%s' "$code" | tr '[:lower:]' '[:upper:]')"
-    [[ "$code" =~ ^[A-Z]{2,3}$ ]] || die "invalid country code: $code (expected 2-3 letters)"
+    case "$mode" in
+        isg)
+            # EESSI ISG codes are always 2 letters (e.g. UK, EL, NO)
+            [[ "$code" =~ ^[A-Z]{2}$ ]] || die "invalid ISG code: $code (ISG codes are always 2 letters)"
+            ;;
+        iso)
+            # ISO 3166-1 alpha-2 (GB) or alpha-3 (GBR)
+            [[ "$code" =~ ^[A-Z]{2,3}$ ]] || die "invalid ISO code: $code (expected alpha-2 or alpha-3)"
+            ;;
+    esac
 fi
 
 case "$mode" in
