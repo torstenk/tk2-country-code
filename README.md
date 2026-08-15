@@ -52,5 +52,26 @@ Krever `curl`; tabellformat krever `jq` (bruk `--format json` uten). Se
 [`skills/eessi-country-lookup/SKILL.md`](skills/eessi-country-lookup/SKILL.md) for
 detaljer.
 
+### Bruke skillen i Copilot CLI
+
+Copilot CLI oppdager skills fra `~/.copilot/skills/`. Aktiver skillen ved å lenke den dit
+(symlink holder den i sync med repoet):
+
+```bash
+ln -s "$(pwd)/skills/eessi-country-lookup" ~/.copilot/skills/eessi-country-lookup
+```
+
+Start deretter en **ny** Copilot CLI-sesjon. Da kan du bruke skillen med naturlig språk:
+
+```
+Hva er ISO-koden for EESSI-landkoden UK?
+```
+
+eller påkalle den eksplisitt:
+
+```
+$eessi-country-lookup slå opp GBR
+```
+
 > Skill vs. MCP: se [`MCP-TODO.md`](MCP-TODO.md) for vurderingen av når et oppslag bør
 > pakkes som MCP i stedet.
