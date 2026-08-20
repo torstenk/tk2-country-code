@@ -36,6 +36,23 @@ Eksponere noen få typede verktøy og gjøre SPARQL-jobben internt:
 Internt: bygger SPARQL, kaller endepunktet, parser SPARQL-JSON, cacher resultater, og
 normaliserer EESSI-avvikene (UK↔GB, EL↔GR).
 
+## Hva med en RAG-server?
+
+RAG er feil verktøy for *dette* oppslaget. Landkodetabellen er liten (~30 rader),
+strukturert og autoritativ, og spørringen er et eksakt nøkkeloppslag (ISG→ISO). RAG er
+laget for uskarpe, semantiske søk i store, ustrukturerte tekstkorpus — og innfører
+approksimasjon (semantisk nærhet kan gi feil land), hallusinasjonsrisiko i
+genereringssteget, samt embeddings + vektordatabase + re-indeksering ved EU-oppdateringer.
+Det er både overengineering og dårligere korrekthet for et oppslag som må være 100 % eksakt.
+
+RAG kan først vurderes hvis scope utvides fra kodetabellen til et bredere, ustrukturert
+EESSI-korpus (dokumenter, evidences, domenemapping — SDG-sporet i `IAEG.md`). Selv da:
+bruk RAG kun for fritekst-dokumentsøk, og behold deterministisk oppslag (skill/MCP/SPARQL)
+for selve kodemappingen.
+
+Full begrunnelse med flerperspektiv-review: se
+[`docs/adr/0001-oppslagsmekanisme-skill-mcp-rag.md`](docs/adr/0001-oppslagsmekanisme-skill-mcp-rag.md).
+
 ## Anbefaling for dette repoet
 
 Vi har allerede Java-tjenesten som gjør nøyaktig dette. For agent-oppslag er en **skill
